@@ -7,6 +7,8 @@ from tensorflow.keras.utils import to_categorical
 import os
 
 
+
+
 def make_dumps():
     print('making dumps')
     (x_train, y_train), (x_test, y_test) = \
@@ -84,6 +86,8 @@ model.compile(loss='categorical_crossentropy',
               optimizer=opt,
               metrics=['accuracy'])
 print('model built')
+
+print(model.summary())
 
 print('training model')
 model.fit(x=x_train, y=y_train_cat, epochs=1)
