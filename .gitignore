@@ -2,3 +2,4 @@ model_architecture.json
 *.h5
 *.p
 .idea/
+logs/

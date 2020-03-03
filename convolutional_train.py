@@ -1,3 +1,5 @@
+import datetime
+
 import tensorflow
 import pickle
 from tensorflow.keras.models import Sequential
@@ -28,6 +30,10 @@ print('looking for dumps')
 if not os.path.isfile('./x_test.p'):
     print('no such file exists')
     make_dumps()
+
+# tensorboard callback
+log_dir = './logs/convolution_model'
+tensorboard_callback = tensorflow.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 x_train = load_dump('x_train.p')
 y_train = load_dump('y_train.p')
@@ -90,7 +96,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(x=x_train, y=y_train_cat, epochs=1)
+model.fit(x=x_train, y=y_train_cat, epochs=1, verbose=1, validation_split=0.3, callbacks=[tensorboard_callback])
 print('model trained')
 
 print('saving model')
