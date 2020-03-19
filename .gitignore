@@ -3,3 +3,5 @@ model_architecture.json
 *.p
 .idea/
 logs/
+og.png
+fc_model_architecture.json
