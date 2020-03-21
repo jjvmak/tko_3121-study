@@ -133,6 +133,7 @@ y_train_cat = to_categorical(y_train)
 x_train = x_train.astype('float32')
 #x_train /= 255
 
+compute_channel_mean_values(x_train)
 # get the indexes
 y_0 = np.where(y_train[:,0] == 0)
 y_1 = np.where(y_train[:,0] == 1)
@@ -178,10 +179,10 @@ dwt2_x_three_class = np.concatenate((dwt2_x_two_class, dwt2_x_2))
 
 
 
-PCA_scatter_plot_for_dwt2(dwt2_x_three_class, train_y_three_class)
+#PCA_scatter_plot_for_dwt2(dwt2_x_three_class, train_y_three_class)
 #PCA_scatter_plot_for_rgb(train_x_three_class, train_y_three_class)
 
-#compute_channel_mean_values(x_train)
+
 
 #histogram_over_data(train_x_two_class)
 

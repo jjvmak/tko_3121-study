@@ -47,12 +47,9 @@ def features(x):
             features_per_image = conc
         else:
             features_per_image = np.vstack((features_per_image, conc))
-    pickle.dump(features_per_image, open("dwt2_features_test.p", "wb"))
+    #pickle.dump(features_per_image, open("dwt2_features_test.p", "wb"))
     #return features_per_image
 
-def wat(x):
-    for i in range(len(x)):
-        print(x)
 
 print('looking for dumps')
 if not os.path.isfile('./x_test.p'):
@@ -78,8 +75,8 @@ input_dim = dwt2_features.shape[1]
 print(input_dim)
 
 # tensorboard callback
-#log_dir = './logs/fc_model'
-#tensorboard_callback = tensorflow.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+log_dir = './logs/fc_model'
+tensorboard_callback = tensorflow.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 model = Sequential()
 model.add(Dense(1296, activation='relu', input_dim=input_dim))
@@ -99,7 +96,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(batch_size=128, x=dwt2_features, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2)
+model.fit(x=dwt2_features, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2, callbacks=[tensorboard_callback])
 print('model trained')
 
 print('saving model')

@@ -7,6 +7,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D
 from tensorflow.keras.layers import Activation, Dropout, Flatten, Dense
 from tensorflow.keras.utils import to_categorical
 import os
+import numpy as np
 
 
 
@@ -43,8 +44,34 @@ y_train_cat = to_categorical(y_train)
 y_test_cat = to_categorical(y_test)
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
-x_train /= 255
-x_test /= 255
+
+#std
+std = np.std(x_train)
+# rgb
+# 125.306918046875
+# 122.950394140625x_train
+# 113.86538318359375
+# Subtract channel mean values
+x_train[:,:,:,0] -= 125.306918046875
+x_train[:,:,:,1] -= 122.950394140625
+x_train[:,:,:,2] -= 113.86538318359375
+# divide by std
+x_train /= std
+# Normalised to [0,1]
+x_train= (x_train - np.min(x_train))/np.ptp(x_train)
+
+# Subtract channel mean values
+x_test[:,:,:,0] -= 125.306918046875
+x_test[:,:,:,1] -= 122.950394140625
+x_test[:,:,:,2] -= 113.86538318359375
+# divide by std
+x_test /= std
+# Normalised to [0,1]
+x_test= (x_test - np.min(x_test))/np.ptp(x_test)
+
+
+
+
 print('dumps loaded')
 
 print('building model')
@@ -83,7 +110,6 @@ model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_co
 model.add(Flatten())
 model.add(Dense(512))
 model.add(Activation('relu'))
-model.add(Dropout(0.5))
 model.add(Dense(10))
 model.add(Activation('softmax'))
 
@@ -107,5 +133,5 @@ model.save_weights('convolution_model_weights.h5')
 print('model saved')
 
 print('\n# Evaluate on test data')
-results = model.evaluate(x_test, y_test_cat, batch_size=128)
+results = model.evaluate(x_test, y_test_cat)
 print('test loss, test acc:', results)
