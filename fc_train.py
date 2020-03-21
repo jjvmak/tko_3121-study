@@ -86,12 +86,10 @@ model.add(Dense(1296, activation='relu', input_dim=input_dim))
 model.add(Dense(1296, activation='relu', name='fc_1'))
 model.add(Dense(1296, activation='relu', name='fc_2'))
 model.add(Dense(1296, activation='relu', name='fc_3'))
-model.add(Flatten())
-model.add(Dense(512))
-model.add(Activation('relu'))
-model.add(Dense(10))
-model.add(Activation('softmax'))
-opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001, decay=1e-6)
+model.add(Dense(512, activation='relu', name='fc_4'))
+model.add(Dense(10, activation='softmax', name='output'))
+
+opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=opt,
@@ -101,7 +99,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(x=dwt2_features, y=y_train_cat, epochs=3, verbose=1, validation_split=0.3)
+model.fit(batch_size=128, x=dwt2_features, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2)
 print('model trained')
 
 print('saving model')

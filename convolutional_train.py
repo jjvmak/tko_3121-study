@@ -87,7 +87,7 @@ model.add(Dropout(0.5))
 model.add(Dense(10))
 model.add(Activation('softmax'))
 
-opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001, decay=1e-6)
+opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=opt,
@@ -97,7 +97,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(x=x_train, y=y_train_cat, epochs=3, verbose=1, validation_split=0.3, callbacks=[tensorboard_callback])
+model.fit(x=x_train, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2, callbacks=[tensorboard_callback])
 print('model trained')
 
 print('saving model')
