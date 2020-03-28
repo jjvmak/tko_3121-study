@@ -78,15 +78,26 @@ print(input_dim)
 log_dir = './logs/fc_model'
 tensorboard_callback = tensorflow.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
+# Stop when val_accuracy starts to decrease -> mitigate overfitting
+early_stop = tensorflow.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.01,
+                                            patience=10, verbose=1, mode='max', restore_best_weights=True)
+
 model = Sequential()
 model.add(Dense(1296, activation='relu', input_dim=input_dim))
 model.add(Dense(1296, activation='relu', name='fc_1'))
+
 model.add(Dense(1296, activation='relu', name='fc_2'))
 model.add(Dense(1296, activation='relu', name='fc_3'))
+model.add(Dropout(0.5))
+
 model.add(Dense(512, activation='relu', name='fc_4'))
+model.add(Dense(512, activation='relu', name='fc_5'))
+model.add(Dense(512, activation='relu', name='fc_6'))
+model.add(Dropout(0.5))
+
 model.add(Dense(10, activation='softmax', name='output'))
 
-opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001)
+opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001, decay=1e-6)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=opt,
@@ -96,7 +107,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(x=dwt2_features, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2, callbacks=[tensorboard_callback])
+model.fit(x=dwt2_features, y=y_train_cat, epochs=50, verbose=1, validation_split=0.3, callbacks=[tensorboard_callback, early_stop])
 print('model trained')
 
 print('saving model')
@@ -107,5 +118,5 @@ print('model saved')
 
 # Evaluate the model on the test data using `evaluate`
 print('\n# Evaluate on test data')
-results = model.evaluate(dwt2_test, y_test_cat, batch_size=128)
+results = model.evaluate(dwt2_test, y_test_cat)
 print('test loss, test acc:', results)

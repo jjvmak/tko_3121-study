@@ -36,6 +36,10 @@ if not os.path.isfile('./x_test.p'):
 log_dir = './logs/convolution_model'
 tensorboard_callback = tensorflow.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
+# Stop when val_accuracy starts to decrease -> mitigate overfitting
+early_stop = tensorflow.keras.callbacks.EarlyStopping(monitor='val_accuracy', min_delta=0.01,
+                                            patience=10, verbose=1, mode='max', restore_best_weights=True)
+
 x_train = load_dump('x_train.p')
 y_train = load_dump('y_train.p')
 x_test = load_dump('x_test.p')
@@ -76,11 +80,9 @@ print('dumps loaded')
 
 print('building model')
 model = Sequential()
-# input
-model.add(Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=x_train.shape[1:]))
 
 # block 1
-model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1'))
+model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1', input_shape=x_train.shape[1:]))
 model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2'))
 model.add(MaxPooling2D((2, 2), strides=(2, 2), name='block1_pool'))
 
@@ -105,15 +107,19 @@ model.add(MaxPooling2D((2, 2), strides=(2, 2), name='block4_pool'))
 model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv1'))
 model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv2'))
 model.add(Conv2D(512, (3, 3), activation='relu', padding='same', name='block5_conv3'))
-
+model.add(Dropout(0.5))
 # output
 model.add(Flatten())
-model.add(Dense(512))
+model.add(Dense(4096))
 model.add(Activation('relu'))
+model.add(Flatten())
+model.add(Dense(4096))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
 model.add(Dense(10))
 model.add(Activation('softmax'))
 
-opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001)
+opt = tensorflow.keras.optimizers.RMSprop(lr=0.0001, decay=1e-6)
 
 model.compile(loss='categorical_crossentropy',
               optimizer=opt,
@@ -123,7 +129,7 @@ print('model built')
 print(model.summary())
 
 print('training model')
-model.fit(x=x_train, y=y_train_cat, epochs=3, verbose=1, validation_split=0.2, callbacks=[tensorboard_callback])
+model.fit(x=x_train, y=y_train_cat, epochs=50, verbose=1, validation_split=0.3, callbacks=[tensorboard_callback, early_stop])
 print('model trained')
 
 print('saving model')
